@@ -1,0 +1,4 @@
+{
+    "rule_table_path": "./data/rule_table.bin",
+    "teacher_data_path": "./data/rosia_teacher.csv"
+}
