@@ -10,7 +10,7 @@ import util
 class Transform_Rule:
     from_fpp = {'オイラ', '吾輩', 'あたい', 'ボク', 'あたし', '私', 'おら', 'こちら', 'オレ', 'わがはい', 'わし', 'ぼく', '小生', 'われわれ', '余', 'わい', '僕', 'わたくし', '我々', 'おれ', 'おいら', 'あちき', '俺', 'わたし', 'われ'}
     from_spp = {'あなた', 'わい', 'キミ', 'きみ', 'おのれ', 'あんた', 'お前', '君', 'てめぇ', 'そち'}
-    def __init__(self, config_path='./data/transform_config.json'):
+    def __init__(self, config_path='./config/transform_config.json'):
         self._rule_table = []
         config = {}
 
