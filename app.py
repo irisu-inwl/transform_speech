@@ -25,6 +25,24 @@ def post_transform():
     response = {'tranform_sentence': tranform_sentence}
     return json.dumps(response)
 
+@app.route("/learn", methods=['PUT','POST'])
+def learning():
+    response = {'success': True}
+
+    if request.method not in ['POST','PUT']:
+        abort(405, {'message': 'Method not allowed'})
+    if request.method == 'POST': 
+        if request.headers['Content-Type'] != 'application/json':
+            abort(400, {'message': 'Content-Type is not application/json'})
+        if not request.data:
+            abort(400, {'message': 'Invalid request'})
+    
+    if request.method == 'PUT':
+        tr.put_rule_table()
+    # TODO: POSTは{'from_sentence':変換前単語,'to_sentence':変換後単語}で学習できる感じの
+
+    return json.dumps(response)
+
 @app.errorhandler(400)
 @app.errorhandler(405)
 def error_handler(error):

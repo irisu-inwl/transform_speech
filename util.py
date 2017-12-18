@@ -21,7 +21,7 @@ def load_pickle(file_path):
         return pickle.load(file)
 
 def get_wakati(sentence):
-    return wakati_tagger.parse(sentence).split(' ')
+    return wakati_tagger.parse(sentence).split(' ')[:-1]
 
 def get_pos_feature(tree, chunk):
     """

@@ -10,6 +10,7 @@ import util
 class Transform_Rule:
     from_fpp = {'オイラ', '吾輩', 'あたい', 'ボク', 'あたし', '私', 'おら', 'こちら', 'オレ', 'わがはい', 'わし', 'ぼく', '小生', 'われわれ', '余', 'わい', '僕', 'わたくし', '我々', 'おれ', 'おいら', 'あちき', '俺', 'わたし', 'われ'}
     from_spp = {'あなた', 'わい', 'キミ', 'きみ', 'おのれ', 'あんた', 'お前', '君', 'てめぇ', 'そち'}
+    final_puncuation = {'。', '！', '♪','…'} # ？は係り受け解析で使うので入れない
     def __init__(self, config_path='./config/transform_config.json'):
         self._rule_table = []
         config = {}
@@ -63,7 +64,7 @@ class Transform_Rule:
         """
         人称代名詞の変換メソッド。今は愚直に形態素で人称代名詞辞書から見つかったものを変換する
         """
-        sentence_list = []
+        sentence_list = [] if  in final_puncuation
         wakati_list = util.get_wakati(sentence)
         for phrase in wakati_list:
             if phrase in Transform_Rule.from_fpp:
@@ -78,6 +79,13 @@ class Transform_Rule:
         """
         入力した発話を変換ルールでキャラクター発話ssssへと変換
         """
+
+        # 後ろの約物は学習の邪魔になるので、あったらはずす
+        final_word = ''
+        if target_sentence[-1] in Transform_Rule.final_puncuation:
+            final_word = target_sentence[-1]
+            target_sentence = target_sentence[:-1]
+
         chunk_dic = util.get_words_received_relates(target_sentence)
         sentence_list = []
         for chunk_obj in chunk_dic['chunks']:
@@ -112,7 +120,9 @@ class Transform_Rule:
         return_sentence = self.add_heart_symbol(return_sentence)
         # 人称代名詞の変換
         return_sentence = self.transform_personal_pronounce(return_sentence)
-
+        # final_wordを最後につける
+        if final_word:
+            return_sentence = return_sentence + final_word
         return return_sentence
 
     def create_rule_table(self,file_path=''):
