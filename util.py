@@ -49,6 +49,10 @@ def get_pos_feature(tree, chunk):
             surface += token.surface 
             base_surface += features[6]
             break
+        else:
+            if surface:
+                break
+
     return surface,base_surface,pos
 
 def validation_transform(from_sentence, to_sentence):

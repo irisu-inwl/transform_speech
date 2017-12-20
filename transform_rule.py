@@ -64,7 +64,7 @@ class Transform_Rule:
         """
         人称代名詞の変換メソッド。今は愚直に形態素で人称代名詞辞書から見つかったものを変換する
         """
-        sentence_list = [] if  in final_puncuation
+        sentence_list = []
         wakati_list = util.get_wakati(sentence)
         for phrase in wakati_list:
             if phrase in Transform_Rule.from_fpp:
