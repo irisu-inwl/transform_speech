@@ -1,10 +1,11 @@
 # transform_speech
 ### 概要
-文章を投げたら学習したキャラクターの言葉に変換する
+文章を投げたら学習したキャラクターの言葉に変換するAPI
 - 環境: 
   - anaconda3+nginx+uwsgi+mecab+cabocha  
 - 環境構築方法は以下を参照:
   - https://m0t0k1ch1st0ry.com/blog/2016/07/30/nlp/
+  - pyenvは使わないほうが良い
 
 キャラクター発話変換方法は以下の論文を参考に組みました。  
 `文章機能部の確率的書き換えによるキャラクタ性変換`: http://www.anlp.jp/proceedings/annual_meeting/2015/pdf_dir/B1-4.pdf
@@ -31,6 +32,15 @@
       "tranform_sentence": [変換された発話]
   }
   ```
+  
+- 例
+
+```
+$ curl localhost:80/transform -H "Content-Type:application/json" -d '{"sentence":"ロージアちゃんは可愛いですね"}' | jq
+{
+  "tranform_sentence": "ロージアちゃんは可愛いね"
+}
+```
 
 ### 学習データ
 - ファイル形式: `csv`
