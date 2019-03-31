@@ -1,0 +1,58 @@
+FROM lambci/lambda:build-python3.6
+ENV LANG C.UTF-8
+ENV AWS_DEFAULT_REGION ap-northeast-1
+
+WORKDIR /var/task
+ADD . .
+
+RUN /bin/cp -f /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
+# mecab installation
+
+RUN curl -L 'https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7cENtOXlicTFaRUE' -o mecab-0.996.tar.gz \
+  && tar zxvf mecab-0.996.tar.gz \
+  && cd mecab-0.996 \
+  && ./configure --prefix=/var/task --with-charset=utf8 --enable-utf8-only \
+  && make && make install \
+  && cd .. && rm -rf mecab-0.996 mecab-0.996.tar.gz
+
+ENV PATH=$PATH:/var/task/bin
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/var/task/lib
+
+RUN pip install mecab-python3 -t /var/task
+
+# IPA dictionary installation
+
+RUN curl -L "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7MWVlSDBCSXZMTXM" -o mecab-ipadic-2.7.0-20070801.tar.gz \
+  && tar -zxvf mecab-ipadic-2.7.0-20070801.tar.gz \
+  && cd mecab-ipadic-2.7.0-20070801 \
+  && ./configure --prefix=/var/task --with-charset=utf8 --with-mecab-config=/var/task/bin/mecab-config \
+  && make && make install \
+  && cd .. && rm -rf mecab-ipadic-2.7.0-20070801 mecab-ipadic-2.7.0-20070801.tar.gz
+
+# CRF++ installation
+
+RUN curl -L 'https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7QVR6VXJ5dWExSTQ' -o CRF++-0.58.tar.gz \
+  && tar zxvf CRF++-0.58.tar.gz \
+  && cd CRF++-0.58 \
+  && ./configure --prefix=/var/task \
+  && make && make install \
+  && cd .. && rm -rf CRF++-0.58.tar.gz CRF++-0.58
+
+# cabocha installation
+
+RUN curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=0B4y35FiV1wh7SDd1Q1dUQkZQaUU" > /dev/null \
+  && CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)" \
+  && curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=0B4y35FiV1wh7SDd1Q1dUQkZQaUU" -o cabocha-0.69.tar.bz2 \
+  && tar jxvf cabocha-0.69.tar.bz2
+
+ARG LDFLAGS=-L/var/task/lib
+ARG CPPFLAGS=-I/var/task/include/
+
+RUN ./configure --with-mecab-config=/var/task/bin/mecab-config --prefix=/var/task --with-charset=utf8 --enable-utf8-only \
+  && make && make install \
+  && cd python \
+  && python3 setup.py build && python3 setup.py install
+
+CMD zip -9 deploy_package.zip speech_transform.py && \
+  zip -r9 deploy_package.zip * -x ./cabocha-0.69/**\* cabocha-0.69.tar.bz2
